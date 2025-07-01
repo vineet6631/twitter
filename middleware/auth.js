@@ -10,7 +10,7 @@ if(!token || token==null){
    general_res({success:false},"link expired or invalid....!",res)
 }
 else{
-JWT.verify(token,process.env.SECRET_KEY,(err,decoded)=>{
+JWT.verify(token,"VINEET",(err,decoded)=>{
     if(err){
         // res.send({ data:{success:false},
         //     message:"token invalid"

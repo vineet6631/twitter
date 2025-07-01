@@ -20,7 +20,7 @@ const login=(req,res)=>{
              firstname: results[0].firstname,
              lastname: results[0].lastname,
              email: results[0].email
-           }, process.env.SECRET_KEY);
+           }, "VINEET");
            console.log(token);
           //  res.send({ data:{success:true, token:token },
           //            message:"login sucess"

@@ -31,7 +31,7 @@ const signup=(req,res)=>{
             firstname: b.firstname,
             lastname: b.lastname,
             email: b.email
-          }, process.env.SECRET_KEY);
+          }, "VINEET");
         console.log(results.insertId);
         general_res({success:true,user_id:user_id,token:token},"proceeding for password",res)
     }
