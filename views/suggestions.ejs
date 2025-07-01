@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            background:#22303c;
+            color: aliceblue;
+        }
+        #container{
+            display: flex;
+            justify-content: space-between;
+            
+        }
+        nav{
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        #left-section nav a{
+            border:1px solid #55ACEE;
+            text-decoration: none;
+            color: aliceblue;
+            text-align: center;
+            width: 200px;
+            border-radius: 10px;
+            padding: 10px;
+
+        }
+        a{
+            text-decoration: none;
+            color: aliceblue;
+        }
+        #left-section nav a:hover{
+            background: aliceblue;
+            color: #15202b;
+            
+
+        }
+        #logo_text{
+            font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif 
+        }
+        #left-section{
+            padding: 10px;
+            border-radius: 10px;
+            background: #15202b;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            border: 5px solid #55ACEE;
+            height: auto;
+            width: 30vw;
+        }
+        #right-section{
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            border: 5px solid #15202b;
+            border-radius: 10px;
+            gap: 5px;
+            background: #55ACEE;
+            height: auto;
+            width: 65vw;
+        }
+        .user_email{
+            display: flex;
+            justify-content: space-between;
+            background-color: #15202b;
+            padding: 10px;
+            border:1px solid #55ACEE;
+            border-radius: 10px;
+        }
+        button{
+            background-color: aliceblue;
+            color: #15202b;
+            border:2px solid #55ACEE;
+            border-radius: 10px;
+            padding: 5px 8px ;
+        }
+        button:hover{
+            cursor: pointer;
+            background-color:#15202b ;
+            color: aliceblue;
+
+        }
+    </style>
+</head>
+<body>
+
+    <div id="container">
+        <div id="left-section">
+            <div id="logo">
+            <img src="https://img.freepik.com/free-vector/new-2023-twitter-logo-x-icon-design_1017-45418.jpg" alt="logo" width="40">
+            <div id="logo_text">Twitter Dashboard</div>
+            </div>
+            <nav>
+                <a href="/render-dashboard">HOME</a>
+                <a href="/render-get-selfprofile">PROFILE</a>
+                <a href="/render-get-suggestions">SUGGESTION</a>
+                <a href="/render-post-tweet">POST_TWEET</a>
+                <a href="/render-followed-tweets">FOR YOU</a>
+            </nav>
+            </div>
+        <div id="right-section">
+            
+
+        </div>
+        
+    </div>
+    <div id="err"></div>
+
+</body>
+<script>
+  async function handle_suggestion(){
+    if(!localStorage.getItem('token')){
+            window.location.href='/render-loginpage';
+        }
+        
+    try {
+                const token=localStorage.getItem('token')
+                const cur_user_id=localStorage.getItem('user_id')
+                const url = `http://localhost:8080/get-suggestions?cur_user_id=${cur_user_id}`;
+                const response = await fetch(url,{
+                    headers:{
+                        'Authorization':token,
+                    }
+                })
+                 json = await response.json()
+                if(json.data.success){
+                  console.log("jsondata",json.data);
+                  for(let i=0;i<json.data.data_obj.length;i++){
+                    let follow_button_tag=`<button class="follow" id="${json.data.data_obj[i].user_id}" onclick="handle_follow(this.id)">FOLLOW</button>`
+                    let unfollow_button_tag=`<button class="unfollow" id="${json.data.data_obj[i].user_id}" onclick="handle_unfollow(this.id)">UNFOLLOW</button>`
+
+                   
+                    document.getElementById('right-section').innerHTML+=`<div class="user_email"><span id="email"><a href="/render-profile?user_id=${json.data.data_obj[i].user_id}&user_email=${json.data.data_obj[i].email}&user_firstname=${json.data.data_obj[i].firstname}">${json.data.data_obj[i].email}</a></span>${follow_button_tag}</div>`
+                    
+                  }
+                }
+                else{
+                    alert(json.message)
+                    window.location.href='/render-loginpage'
+                }
+
+            } catch (error) {
+                console.log(json.Error);
+            }
+    }
+    handle_suggestion();
+
+ async function handle_follow(following_user_id){
+    if(!localStorage.getItem('token')){
+            window.location.href='http://localhost:8080/render-loginpage';
+        }
+
+    try {
+                const token=localStorage.getItem('token')
+                const cur_user_id=localStorage.getItem('user_id')
+                const url = `http://localhost:8080/follow?cur_user_id=${cur_user_id}&following_user_id=${following_user_id}`;
+                const response = await fetch(url,{
+                    headers:{
+                        'Authorization':token,
+                    }
+                })
+                 json = await response.json()   
+                if(json.data.success){
+                  console.log("jsondata",json);
+                  document.getElementById(following_user_id).innerText='UNFOLLOW'
+                  document.getElementById(following_user_id).setAttribute('onclick',"handle_unfollow(this.id)")
+
+                }
+                else{
+                    document.getElementById('err').innerText=json.message;
+                }
+
+            } catch (error) {
+                console.log(json.Error);
+            }
+    }
+    async function handle_unfollow(following_user_id) {
+        if(!localStorage.getItem('token')){
+            window.location.href='http://localhost:8080/render-loginpage';
+        }
+
+    try {
+                const token=localStorage.getItem('token')
+                const cur_user_id=localStorage.getItem('user_id')
+                const url = `http://localhost:8080/unfollow?cur_user_id=${cur_user_id}&following_user_id=${following_user_id}`;
+                const response = await fetch(url,{
+                    headers:{
+                        'Authorization':token,
+                    }
+                })
+                 json = await response.json()   
+                if(json.data.success){
+                  console.log("jsondata",json);
+                  document.getElementById(following_user_id).innerText='FOLLOW'
+                  document.getElementById(following_user_id).setAttribute('onclick',"handle_follow(this.id)")
+
+                }
+                else{
+                    document.getElementById('err').innerText=json.message;
+                }
+
+            } catch (error) {
+                console.log(json.Error);
+            }
+    }
+</script>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=\, initial-scale=1.0">
+    <title>Sign up</title>
+    <style>
+       body{
+        height: 100vh;
+        width: auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #15202b;
+       } 
+       #formId{
+        padding: 10px;
+        border: 5px solid #55ACEE;
+         color: aliceblue;
+         border-radius: 10px;
+       }
+    </style>
+</head>
+<body>
+    <form action="" id="formId">
+        <label for="fname">First name:</label>
+        <input type="text" id="fname" name="fname">
+        <br><br>
+        <label for="lname">Last name:</label>
+        <input type="text" id="lname" name="lname">
+        <br><br>
+        <label for="email">Email:</label>
+        <input type="text" id="email" name="email">
+        <br><br>
+        <!-- <label for="password">Password:</label>
+        <input type="text" id="password" name="password">
+        <br><br> -->
+        <div id="err"></div>
+        <br>
+        <input type="submit" name="" id="submit_id" value="Submit">
+    </form>
+    <script>
+        console.log("hllo");
+        let form=document.getElementById('formId');
+        
+        
+        form.addEventListener('submit',async (e)=>{
+            e.preventDefault();
+              let formdata=new FormData();
+              formdata.append('firstname',fname.value)
+              formdata.append('lastname',lname.value)
+              formdata.append('email',email.value)
+              console.log(formdata);
+              var json;
+            try {
+                const url = '/signup';
+                const response = await fetch(url,{
+                    method: "post",
+                    body: formdata
+                })
+                 json = await response.json()
+                if(json.data.success){
+                  console.log("jsondata",json);
+                  let user_id=json.data.user_id
+                  let token=json.data.token
+                  document.getElementById('err').innerText=json.message;
+                  setTimeout(()=>{ window.location.href=`/virtual-email?user_id=${user_id}&token=${token}`},2000);
+                   
+                }
+                else{
+                    document.getElementById('err').innerText=json.message;
+                }
+
+            } catch (error) {
+                console.log(json.Error);
+            }
+        })
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            background:#22303c;
+            color: aliceblue;
+        }
+        #container{
+            display: flex;
+            justify-content: space-between;
+            
+        }
+        nav{
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        #left-section nav a{
+            border:1px solid #55ACEE;
+            text-decoration: none;
+            color: aliceblue;
+            text-align: center;
+            width: 200px;
+            border-radius: 10px;
+            padding: 10px;
+
+        }
+        #left-section nav a:hover{
+            background: aliceblue;
+            color: #15202b;
+            
+
+        }
+        #logo_text{
+            font-size: x-large;
+            font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
+        }
+        #left-section{
+            padding: 10px;
+            border-radius: 10px;
+            background: #15202b;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            border: 5px solid #55ACEE;
+            height: auto;
+            width: 30vw;
+        }
+        #right-section{
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            border: 5px solid #15202b;
+            border-radius: 10px;
+            background: #55ACEE;
+            height: auto;
+            width: 65vw;
+        }
+        #right-section div a{
+            text-decoration: none;
+            color: aliceblue;
+        }
+
+        #tweets_parent{
+            padding: 10px;
+            margin-top: 20px;
+            border :3px solid #8899ac;
+            background: #15202b;
+            color: aliceblue;
+            border-radius: 10px;
+            
+        
+        }
+        #profile{
+            border:1px solid #22303c;
+            background-color: #15202b;
+            justify-content: space-between;
+            padding: 50px;
+            border-radius: 10px;
+            display: flex;
+        }
+    </style>
+</head>
+<body>
+    
+
+    <div id="container">
+        <div id="left-section">
+            <div id="logo">
+            <img src="https://img.freepik.com/free-vector/new-2023-twitter-logo-x-icon-design_1017-45418.jpg" alt="logo" width="40">
+            <div id="logo_text">Twitter Dashboard</div>
+            </div>
+            <nav>
+                <a href="/render-dashboard">HOME</a>
+                <a href="/render-get-selfprofile">PROFILE</a>
+                <a href="/render-get-suggestions">SUGGESTION</a>
+                <a href="/render-post-tweet">POST_TWEET</a>
+                <a href="/render-followed-tweets">FOR YOU</a>
+            </nav>
+            </div>
+        <div id="right-section">
+         <div id="profile"> 
+            <div >  
+         <div>USERMAIL : <span id="user_email"></span></div><br>
+         <div>USERNAME : <span id="user_name"></span></div>
+           </div>
+         <div><a href="/render-follower">FOLLOWERS : </a><span id="followers"></span></div>
+         <div><a href="/render-following">FOLLOWINGS : </a> <span id="following"></span></div>
+        </div>
+        </div>
+        
+
+    </div>
+
+</body>
+<script>
+   async function handle_profile(){
+    if(!localStorage.getItem('token')){
+            window.location.href='/render-loginpage';
+        }
+        
+    // try {
+                const token=localStorage.getItem('token')
+                const cur_user_id=localStorage.getItem('user_id')
+                const cur_user_email=localStorage.getItem('cur_user_email')
+                const firstname=localStorage.getItem('firstname')
+                document.getElementById('user_email').innerText=cur_user_email
+                document.getElementById('user_name').innerText=firstname
+
+                const url = `http://localhost:8080/get-selfprofile?user_id=${cur_user_id}`;
+                const response = await fetch(url,{
+                    headers:{
+                        'Authorization':token,
+                    }
+                })
+                 json = await response.json()
+                if(json.data.success){
+                  console.log("jsondata",json.data);
+                  let tweets_liked=json.data.data_obj2;
+                  let retweets_liked=json.data.data_obj3;
+                  let no_of_following=json.data.data_obj4.length
+                  let no_of_follower=json.data.data_obj5.length
+                //   console.log("ryh5",no_of_following)
+                //   console.log(no_of_follower)
+
+                  
+                  document.getElementById('following').innerText=no_of_following
+                  document.getElementById('followers').innerText=no_of_follower
+
+
+                  for(let i=0;i<json.data.data_obj.length;i++){
+                    
+                    let temp_html_string=``
+                    if(json.data.data_obj[i].is_retweet===1){
+                        
+                        let retweet_like_button_tag=`<button class="like" id="like_retweet_${json.data.data_obj[i].tweet_id}" onclick="handle_like(this.id)">LIKE</button>`
+                        let retweet_unlike_button_tag=`<button class="unlike" id="unlike_retweet_${json.data.data_obj[i].tweet_id}" onclick="handle_unlike(this.id)">UNLIKE</button>`
+
+                        temp_html_string+=` <div id="tweets_parent">
+                                <div class="tweeted_by" id="">USER_NAME:${json.data.data_obj[i].tweet_user}</div><br>
+                                <div class="tweets" id="">TWEET:${json.data.data_obj[i].tweet_string} </div><br>
+                                <div>RETWEETED BY:${json.data.data_obj[i].retweet_user}</div><br>
+                                <div>RETWEET QUOTE:${json.data.data_obj[i].retweet_string}</div><br>`  
+                           
+                        if(retweets_liked.includes(json.data.data_obj[i].tweet_id)){
+                            temp_html_string+=`${retweet_unlike_button_tag}<span id="retweet_likecount_${json.data.data_obj[i].tweet_id}">${json.data.data_obj[i].likes}</span></div>`
+                            document.getElementById('right-section').innerHTML+=temp_html_string
+                        }
+                        else{
+                            temp_html_string+=`${retweet_like_button_tag}<span id="retweet_likecount_${json.data.data_obj[i].tweet_id}">${json.data.data_obj[i].likes}</span></div>`
+                            document.getElementById('right-section').innerHTML+=temp_html_string
+                        }     
+                    }
+                    else if(json.data.data_obj[i].is_retweet===0){
+
+                    let like_button_tag=`<button class="like" id="like_tweet_${json.data.data_obj[i].tweet_id}" onclick="handle_like(this.id)">LIKE</button>`
+                    let unlike_button_tag=`<button class="unlike" id="unlike_tweet_${json.data.data_obj[i].tweet_id}" onclick="handle_unlike(this.id)">UNLIKE</button>`
+                       
+                    temp_html_string+=`<div id="tweets_parent"><div class="tweeted_by" id="">USER_NAME:${json.data.data_obj[i].tweet_user}</div><br>
+                                <div class="tweets" id="">TWEET: ${json.data.data_obj[i].tweet_string}</div><br>`
+
+                    if(tweets_liked.includes(json.data.data_obj[i].tweet_id)){
+                   
+                   temp_html_string+=`${unlike_button_tag}<span id="tweet_likecount_${json.data.data_obj[i].tweet_id}">${json.data.data_obj[i].likes}</span>`
+                   
+                    }
+                    else{
+                        temp_html_string+=`${like_button_tag}<span id="tweet_likecount_${json.data.data_obj[i].tweet_id}">${json.data.data_obj[i].likes}</span>`
+                    }
+                    temp_html_string+=`<button id="tweet_${json.data.data_obj[i].tweet_id}" onclick="handle_retweet(this.id)">RETWEET</button></div><br>`
+                    document.getElementById('right-section').innerHTML+=temp_html_string
+
+                  }
+                }
+
+                }
+                else{
+                    alert(json.message)
+                    window.location.href='/render-loginpage'
+                }
+
+            // } catch (error) {
+            //     console.log(json.Error);
+            // }
+   }
+   handle_profile();
+   async function handle_like(id) {
+       const myarray=id.split("_")
+       let tweet_id=myarray[2];
+       let type=myarray[1]
+       console.log("hello",tweet_id);
+       console.log(type);
+       
+    
+    if(!localStorage.getItem('token')){
+            window.location.href='/render-loginpage';
+        }
+        
+    try {
+                const token=localStorage.getItem('token')
+                const cur_user_id=localStorage.getItem('user_id')
+                const cur_user_email=localStorage.getItem('cur_user_email')
+                   
+                const url = `/like?user_id=${cur_user_id}&tweet_id=${tweet_id}&type=${type}`;
+                const response = await fetch(url,{
+                    headers:{
+                        'Authorization':token,
+                    }
+                })
+                 json = await response.json()
+                if(json.data.success){
+                  console.log("jsondata",json);
+                  document.getElementById(id).innerText='UNLIKE'
+                  document.getElementById(id).setAttribute('onclick',"handle_unlike(this.id)")
+                  document.getElementById(`${type}_likecount_${tweet_id}`).innerText=parseInt(document.getElementById(`${type}_likecount_${tweet_id}`).innerText)+1
+                }
+                else{
+                    document.getElementById('err').innerText=json.message;
+                }
+
+            } catch (error) {
+                console.log(json.Error);
+            }
+   }
+   async function handle_unlike(id) {
+    const myarray=id.split("_")
+       let tweet_id=myarray[2];
+       let type=myarray[1]
+       console.log("hello",tweet_id);
+       console.log(type);
+    
+    if(!localStorage.getItem('token')){
+            window.location.href='/render-loginpage';
+        }
+        
+    try {
+                const token=localStorage.getItem('token')
+                const cur_user_id=localStorage.getItem('user_id')
+                const cur_user_email=localStorage.getItem('cur_user_email')
+                const url = `/unlike?user_id=${cur_user_id}&tweet_id=${tweet_id}&type=${type}`;
+                const response = await fetch(url,{
+                    headers:{
+                        'Authorization':token,
+                    }
+                })
+                 json = await response.json()
+                if(json.data.success){
+                  console.log("jsondata",json);
+                  document.getElementById(id).innerText='LIKE'
+                  document.getElementById(id).setAttribute('onclick',"handle_like(this.id)")
+                  document.getElementById(`${type}_likecount_${tweet_id}`).innerText=parseInt(document.getElementById(`${type}_likecount_${tweet_id}`).innerText)-1
+                }
+                else{
+                    document.getElementById('err').innerText=json.message;
+                }
+
+            } catch (error) {
+                console.log(json.Error);
+            }
+   }
+   async function handle_retweet(id){
+    const myarray=id.split("_")
+    let tweet_id=myarray[1];
+    console.log(myarray[1]);
+    
+
+    if(!localStorage.getItem('token')){
+            window.location.href='/render-loginpage';
+        }
+        
+    try {
+                const token=localStorage.getItem('token')
+                const cur_user_id=localStorage.getItem('user_id')
+                const cur_user_email=localStorage.getItem('cur_user_email')
+                const url = `/retweet?user_id=${cur_user_id}&tweet_id=${tweet_id}`;
+                const response = await fetch(url,{
+                    headers:{
+                        'Authorization':token,
+                    }
+                })
+                 json = await response.json()
+                if(json.data.success){
+                  console.log("jsondata",json);
+                }
+                else{
+                    document.getElementById('err').innerText=json.message;
+                }
+
+            } catch (error) {
+                console.log(json.Error);
+            }
+  }
+</script>
+</html>

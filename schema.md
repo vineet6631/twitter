@@ -1,0 +1,45 @@
+```
+└── 📁Twitter
+    └── 📁config
+        └── db_connect.js
+    └── 📁controllers
+        └── follow.js
+        └── get_dashboard.js
+        └── get_follower.js
+        └── get_self_profile.js
+        └── get_suggestions.js
+        └── get-following.js
+        └── get-profile.js
+        └── like.js
+        └── login.js
+        └── post_tweet.js
+        └── retweet.js
+        └── set_password.js
+        └── signup.js
+        └── unfollow.js
+        └── unlike.js
+    └── 📁helpers
+        └── general_res.js
+    └── 📁images
+        └── logo.png
+        └── logo3.png
+    └── 📁middleware
+        └── auth.js
+        └── check_for_verification.js
+        └── schema_validation.js
+    └── 📁views
+        └── dashboard.ejs
+        └── follower.ejs
+        └── following.ejs
+        └── login.ejs
+        └── post_tweet.ejs
+        └── self-profile.ejs
+        └── set-password.ejs
+        └── signup.ejs
+        └── suggestions.ejs
+        └── virtual_mail.ejs
+    └── .env
+    └── package-lock.json
+    └── package.json
+    └── server.js
+```

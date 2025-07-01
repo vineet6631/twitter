@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+         height: 100vh;
+         width: auto;
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         background: #15202b;
+        } 
+        #formId{
+         padding: 20px;
+         border: 5px solid #55ACEE;
+          color: aliceblue;
+          border-radius: 10px;
+        }
+        #submit{
+            background-color: aliceblue;
+            color: #15202b;
+            border:2px solid #55ACEE;
+            border-radius: 10px;
+            padding: 5px 8px ;
+        }
+        #submit:hover{
+            cursor: pointer;
+            background-color:#15202b ;
+            color: aliceblue;
+
+        }
+     </style>
+</head>
+<body>
+    <form action="" id="formId">
+        <label for="email">Email:</label>
+        <input type="text" id="email" name="email">
+        <br><br>
+        <label for="password">Password:</label>
+        <input type="text" id="password" name="password">
+        <br><br>
+        <input type="submit" name="" id="submit" value="Submit">
+        <div id="err"></div>
+    </form>
+    <script>
+        document.getElementById('formId').addEventListener('submit',async (e)=>{
+            e.preventDefault();
+
+            const req_body = {
+                email: document.getElementById('email').value,
+                password: password.value,
+            }
+
+            console.log(req_body);
+
+            try {
+                const url = '/logindata';
+                const response = await fetch(url,{
+                    method: "post",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(req_body)
+                })
+                const json = await response.json()
+                if(json.data.success){
+                    localStorage.setItem('token',json.data.token);
+                    localStorage.setItem('user_id',json.data.user_id);
+                    localStorage.setItem('firstname',json.data.firstname);
+
+                    localStorage.setItem('cur_user_email',req_body.email)
+                    console.log("token",localStorage.getItem('token'));
+                    window.location.href='/render-dashboard'
+
+                    
+                }
+                else{
+                    document.getElementById('err').innerText=json.message
+                }
+
+            } catch (error) {
+                console.log(error);
+            }
+        })
+    </script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <button onclick="handleclick()">click here for set password</button>
+</body>
+<script>
+    var token;
+    var user_id
+    window.onload=async ()=>{
+    let cur_url=window.location.href
+    const url = new URL(cur_url);
+    const params1 = new URLSearchParams(url.search);
+     user_id = params1.get("user_id")
+     token=params1.get("token")
+    
+    }
+    async function handleclick(){
+        try{ 
+        const url=`http://localhost:8080/check-valid`;
+        const response=await fetch(url,{
+        
+          headers:{
+            'Authorization':token
+          }
+        })
+        const json = await response.json();
+        console.log(json);
+        if(!json.data.success){
+            window.prompt("your link is expired or invalid")
+        }
+        else{
+            window.location.href=`http://localhost:8080/render-set-password?user_id=${user_id}&token=${token}`
+        }
+    
+    }
+    catch (error) {
+    console.error(error.message);
+      }
+    }
+    
+</script>
+</html>
